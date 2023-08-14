@@ -33,7 +33,7 @@ function quizzesReducer(state, action) {
     }
 
     case "UPDATE_NEXT": {
-    //   console.log("Before: UPFATE_NEXT", state);
+      //   console.log("Before: UPFATE_NEXT", state);
       /* 
             Lets handle two cases 
             1) increment the currect state
@@ -43,7 +43,7 @@ function quizzesReducer(state, action) {
       */
       const { index, timeTaken } = payload;
       const updatedState = { ...state };
-      if (!state.showSkippedQuestions) {
+      if (!updatedState.showSkippedQuestions) {
         updatedState.currentIndex = state.currentIndex + 1;
         updatedState.data[index] = {
           ...updatedState.data[index],
@@ -69,7 +69,7 @@ function quizzesReducer(state, action) {
           }
         }
       }
-    //   console.log("UPDATE_NEXT", updatedState);
+      //   console.log("UPDATE_NEXT", updatedState);
       return updatedState;
     }
 
@@ -95,29 +95,43 @@ function quizzesReducer(state, action) {
     }
 
     case "SHOW_SKIPPED_QUESTIONS": {
+      /* 
+            Lets handle two cases 
+            1) dispatched with skipped question (isSkipped defined)
+            2) dispatched with attempted question (isSkipped undefined)
+      */
+
       /*
             1) set showSkippedQuestions to activate the working
                 flow to display only skipped questions
             2) and set the currentIndex state to the very first skipped question
             3) Save the state of attempted question that is in payload
       */
-      const { index, timeTaken } = payload;
+      const { index, timeTaken, isSkipped } = payload;
+      const updatedState = { ...state, showSkippedQuestions: true };
 
-      // this will get the very first index of skipped question
-      const currentIndex = state.data.findIndex((quiz) => quiz.isSkipped);
-      const updatedState = {
-        ...state,
-        currentIndex,
-        showSkippedQuestions: true,
-      };
+      if (isSkipped) {
+        updatedState.data[index] = {
+          ...updatedState.data[index],
+          timeTaken,
+          isSkipped: true,
+        };
+        const currentIndex = updatedState.data.findIndex(
+          (quiz) => quiz.isSkipped
+        );
+        updatedState.currentIndex = currentIndex;
+      } else {
+        // this will get the very first index of skipped question
+        const currentIndex = state.data.findIndex((quiz) => quiz.isSkipped);
+        updatedState.currentIndex = currentIndex;
+        updatedState.data[index] = {
+          ...updatedState.data[index],
+          timeTaken,
+          isAttempted: true,
+        };
+      }
 
-      updatedState.data[index] = {
-        ...updatedState.data[index],
-        timeTaken,
-        isAttempted: true,
-      };
-
-    //   console.log("SHOW_SKIPPED_QUESTIONS", updatedState);
+      //   console.log("SHOW_SKIPPED_QUESTIONS", updatedState);
       return updatedState;
     }
     default:

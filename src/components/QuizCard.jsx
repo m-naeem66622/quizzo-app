@@ -9,8 +9,8 @@ const QuizCard = ({
   dispatch,
   counterState,
   isAllVisited, // Remember: isAllVisited only be true after all question submitted (isSkipped or isAttemped)
-  isAllAttempted,
-  isAnySkipped,
+  skippedQuestions,
+  showSkippedQuestions,
 }) => {
   const { question, correct_answer, incorrect_answers, selected } = quizData;
   const { counter, setCounter } = counterState;
@@ -27,9 +27,9 @@ const QuizCard = ({
 
   const handleOnClickNext = () => {
     const timeTaken = Date.now() - questionStartedAt;
-    if (isAllVisited && !isAnySkipped) {
+    if (isAllVisited && !skippedQuestions) {
       // console.log("QuizCard: SUBMIT_QUIZ dispatched from nextHandle");
-      console.log("QuizPlayer: quiz submitted after all attempted by user");
+      console.log("QuizPlayer: quiz submitted by user after all attempted");
       dispatch({
         type: "SUBMIT_QUIZ",
         payload: { index: currentQuizIndex, timeTaken },
@@ -55,10 +55,21 @@ const QuizCard = ({
 
   const handleOnClickSkip = () => {
     const timeTaken = Date.now() - questionStartedAt;
-    dispatch({
-      type: "UPDATE_SKIPPED",
-      payload: { index: currentQuizIndex, timeTaken },
-    });
+    if (currentQuizIndex + 1 === totalQuizzes) {
+      // console.log(
+      //   "QuizCard: SHOW_SKIPPED_QUESTIONS dispatched from skipHandle"
+      // );
+      dispatch({
+        type: "SHOW_SKIPPED_QUESTIONS",
+        payload: { index: currentQuizIndex, timeTaken, isSkipped: true },
+      });
+    } else {
+      // console.log("QuizCard: UPDATE_SKIPPED dispatched from skipHandle");
+      dispatch({
+        type: "UPDATE_SKIPPED",
+        payload: { index: currentQuizIndex, timeTaken },
+      });
+    }
   };
 
   useEffect(() => {
@@ -119,8 +130,10 @@ const QuizCard = ({
             Skipped Question
           </p>
         )}
-        {/* If user is on the last question and isAllAttempted = false */}
-        {isAnySkipped && currentQuizIndex + 1 === totalQuizzes ? (
+        {/* If user is on the last question and if there is any skipped question */}
+        {skippedQuestions &&
+        currentQuizIndex + 1 === totalQuizzes &&
+        !showSkippedQuestions ? (
           <Button
             onClick={handleOnClickShowSkip}
             disabled={selected === undefined}
@@ -133,14 +146,16 @@ const QuizCard = ({
             onClick={handleOnClickNext}
             disabled={selected === undefined}
             className={`px-4 py-2 ${
-              (isAllVisited && !isAnySkipped) ||
-              currentQuizIndex + 1 === totalQuizzes
+              (isAllVisited && !skippedQuestions) ||
+              currentQuizIndex + 1 === totalQuizzes ||
+              (skippedQuestions === 1 && showSkippedQuestions)
                 ? "button-b-type"
                 : "button-a-type"
             }`}
           >
-            {(isAllVisited && !isAnySkipped) ||
-            currentQuizIndex + 1 === totalQuizzes
+            {(isAllVisited && !skippedQuestions) ||
+            currentQuizIndex + 1 === totalQuizzes ||
+            (skippedQuestions === 1 && showSkippedQuestions)
               ? "Submit"
               : "Next"}
           </Button>

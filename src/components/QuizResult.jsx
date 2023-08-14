@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import timeStamp from "../helpers/timeStamp.js";
 import Button from "./common/Button";
 
-function QuizResult({ data, isTimerUp }) {
+function QuizResult({ data, isTimerUp, timeToSolveQuiz }) {
   const [result, setResult] = useState(handleResultCalculator());
 
   function handleResultCalculator() {
@@ -13,7 +13,7 @@ function QuizResult({ data, isTimerUp }) {
       questionsSkipped: 0,
       correctAnswers: 0,
       incorrectAnswers: 0,
-      bestTime: 300000,
+      bestTime: timeToSolveQuiz,
       worstTime: 0,
       averageTime: 0,
     };
@@ -40,7 +40,7 @@ function QuizResult({ data, isTimerUp }) {
         // adding time taken for each quiz
         resultTemp.averageTime += quiz.timeTaken;
         resultTemp.totalTimeTaken += quiz.timeTaken;
-      } else {
+      } else if (quiz.isSkipped) {
         resultTemp.questionsSkipped = resultTemp.questionsSkipped + 1;
         // adding time taken for each quiz
         resultTemp.totalTimeTaken += quiz.timeTaken;
@@ -57,14 +57,19 @@ function QuizResult({ data, isTimerUp }) {
             is already calculated
     */
     if (isTimerUp) {
-      resultTemp.totalTimeTaken = 300000; // Maximum Time For Quiz in milliseconds
+      resultTemp.totalTimeTaken = timeToSolveQuiz; // Maximum Time For Quiz in milliseconds
+    }
+
+    if (resultTemp.questionsAttempted === 0) {
+      resultTemp.bestTime = 0;
+      resultTemp.averageTime = 0;
     }
 
     return resultTemp;
   }
 
   return (
-    <div className="bg-gradient-to-br from-blue-400 to-purple-600 text-white rounded-lg shadow-md p-6">
+    <div className="bg-gradient-to-br from-blue-400 to-purple-600 text-white rounded-lg shadow-md p-6 max-w-3xl mx-auto">
       <div className="flex flex-col items-center space-y-6">
         <h2 className="text-4xl font-extrabold mb-4">🏆 Quiz Results 🏆</h2>
         <div className="grid grid-cols-2 gap-8">

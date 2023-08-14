@@ -4,16 +4,18 @@ import quizSampleData from "../assets/quiz-sample.json";
 import quizzesReducer from "../helpers/quizzesReducer";
 import QuizResult from "./QuizResult";
 
-function QuizPlayer() {
+function QuizPlayer({ time = 60 }) {
   // To be removed and integrate API
   const data = JSON.stringify(quizSampleData);
   const json = JSON.parse(data);
 
   const [allQuestionsVisited, setAllQuestionsVisited] = useState(false);
   const [allQuestionsAttempted, setAllQuestionsAttempted] = useState(false);
-  const [anyQuestionAttempted, setAnyQuestionAttempted] = useState(false);
+  // const [anyQuestionSkipped, setAnyQuestionSkipped] = useState(false);
+  const [skippedQuestions, setSkippedQuestions] = useState(0);
 
   const [quizzes, dispatch] = useReducer(quizzesReducer, {
+    showSkippedQuestions: false,
     showResult: false,
     isTimerUp: false,
     currentIndex: 0,
@@ -21,9 +23,9 @@ function QuizPlayer() {
     data: [],
   });
   const [counter, setCounter] = useState({
-    minute: "05",
-    second: "00",
-    count: 300,
+    minute: "00",
+    second: "30",
+    count: time,
   });
 
   useEffect(() => {
@@ -38,7 +40,7 @@ function QuizPlayer() {
       : false;
 
     const questionIsSkipped = quizzes.data.length
-      ? quizzes.data.some((quiz) => quiz.isSkipped)
+      ? quizzes.data.reduce((acc, quiz) => (quiz.isSkipped ? acc + 1 : acc), 0)
       : false;
 
     // console.log(
@@ -52,7 +54,7 @@ function QuizPlayer() {
     // );
     setAllQuestionsVisited(allQuestionsAreVisited);
     setAllQuestionsAttempted(allQuestionsAreAttempted);
-    setAnyQuestionAttempted(questionIsSkipped);
+    setSkippedQuestions(questionIsSkipped);
     // console.log("QuizPlayer: quizzes upadted", quizzes);
   }, [quizzes]);
 
@@ -82,9 +84,8 @@ function QuizPlayer() {
     } else if (!quizzes.showResult) {
       console.log("QuizPlayer: quiz auto submitted after timer up");
       setTimeout(() => {
-        dispatch({ type: "SUBMIT_QUIZ", payload: { isTimerUp } });
+        dispatch({ type: "SUBMIT_QUIZ", payload: { isTimerUp: true } });
       }, 1000);
-      setCounter({ minute: 0, second: 0, count: 0 });
     }
   }, [counter, allQuestionsAttempted]);
 
@@ -124,14 +125,18 @@ function QuizPlayer() {
           dispatch={dispatch}
           counterState={{ counter, setCounter }}
           isAllVisited={allQuestionsVisited}
-          isAllAttempted={allQuestionsAttempted}
-          isAnySkipped={anyQuestionAttempted}
+          skippedQuestions={skippedQuestions}
+          showSkippedQuestions={quizzes.showSkippedQuestions}
         />
       )}
 
       {/* Show QuizReuslt only when showResult is true */}
       {quizzes.showResult && (
-        <QuizResult isTimerUp={quizzes.isTimerUp} data={quizzes.data} />
+        <QuizResult
+          isTimerUp={quizzes.isTimerUp}
+          data={quizzes.data}
+          timeToSolveQuiz={Number(time) * 1000} // totoal time in milliseconds
+        />
       )}
     </>
   );
