@@ -1,6 +1,7 @@
 import React, { useEffect, useReducer, useState } from "react";
 import QuizCard from "./QuizCard";
 import quizzesReducer from "../helpers/quizzesReducer";
+import timeStamp from "../helpers/timeStamp.js";
 import QuizResult from "./QuizResult";
 
 function QuizPlayer({ data = { results: [] } }) {
@@ -17,8 +18,7 @@ function QuizPlayer({ data = { results: [] } }) {
     data: [],
   });
   const [counter, setCounter] = useState({
-    minute: 0,
-    second: 0,
+    ...timeStamp(data.time, false, [false, false]),
     count: data.time,
   });
 

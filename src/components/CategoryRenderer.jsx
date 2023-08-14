@@ -1,16 +1,17 @@
 import React from "react";
+import timeStamp from "../helpers/timeStamp";
 
 const CategoryRenderer = ({ id, category, handleOnClick }) => {
   const cards = [
-    { difficulty: "Easy", time: 60, numQuestions: 10 },
+    { difficulty: "Easy", time: 120, numQuestions: 10 },
     {
       difficulty: "Medium",
-      time: 120,
+      time: 210,
       numQuestions: 20,
     },
     {
       difficulty: "Hard",
-      time: 180,
+      time: 300,
       numQuestions: 30,
     },
   ];
@@ -33,7 +34,9 @@ const CategoryRenderer = ({ id, category, handleOnClick }) => {
               <p className="text-blue-200 text-lg">
                 No. of Questions: {card.numQuestions}
               </p>
-              <p className="text-blue-200 text-lg">Time: {card.time} min</p>
+              <p className="text-blue-200 text-lg">
+                Time: {timeStamp(card.time, true, [false, false])}
+              </p>
             </div>
             <button
               onClick={() =>

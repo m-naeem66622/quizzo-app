@@ -7,10 +7,6 @@ import Categories from "./components/Categories";
 function App() {
   const [data, setData] = useState({ results: [] });
 
-  useEffect(() => {
-    // console.log(data);
-  }, [data]);
-
   return (
     <div>
       <Router>

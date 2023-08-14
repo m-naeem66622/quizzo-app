@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import timeStamp from "../helpers/timeStamp.js";
 import Button from "./common/Button";
+import { Link } from "react-router-dom";
 
 function QuizResult({ data, isTimerUp, timeToSolveQuiz }) {
   const [result, setResult] = useState(handleResultCalculator());
@@ -76,7 +77,8 @@ function QuizResult({ data, isTimerUp, timeToSolveQuiz }) {
           <div className="border-r-2 border-gray-400 pr-8">
             <p className="text-xl font-semibold mb-2">📊 Stats 📊</p>
             <p>
-              ⏱️ Total Time Taken: {timeStamp(result.totalTimeTaken / 1000)}
+              ⏱️ Total Time Taken:{" "}
+              {timeStamp(result.totalTimeTaken / 1000, true, [false, false])}
             </p>
             <p>📝 Questions Attempted: {result.questionsAttempted}</p>
             <p>🤔 Questions Skipped: {result.questionsSkipped}</p>
@@ -85,16 +87,28 @@ function QuizResult({ data, isTimerUp, timeToSolveQuiz }) {
           </div>
           <div className="pl-8">
             <p className="text-xl font-semibold mb-2">⏰ Timings ⏰</p>
-            <p>🕒 Average Time: {timeStamp(result.averageTime / 1000)}</p>
-            <p>⏱️ Best Time: {timeStamp(result.bestTime / 1000)}</p>
-            <p>⏱️ Worst Time: {timeStamp(result.worstTime / 1000)}</p>
+            <p>
+              🕒 Average Time:{" "}
+              {timeStamp(result.averageTime / 1000, true, [false, true])}
+            </p>
+            <p>
+              ⏱️ Best Time:{" "}
+              {timeStamp(result.bestTime / 1000, true, [false, true])}
+            </p>
+            <p>
+              ⏱️ Worst Time:{" "}
+              {timeStamp(result.worstTime / 1000, true, [false, true])}
+            </p>
           </div>
         </div>
       </div>
       <div className="mt-10 text-center">
-        <Button className="px-6 py-3 text-xl font-semibold button-a-type">
+        <Link
+          to="/"
+          className="px-6 py-3 text-xl font-semibold button-a-type rounded-md focus:outline-none bg-gradient-to-r text-white transition duration-300"
+        >
           🚀 Explore Best Ever Result 🚀
-        </Button>
+        </Link>
       </div>
     </div>
   );
