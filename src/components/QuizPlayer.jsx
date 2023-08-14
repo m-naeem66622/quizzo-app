@@ -1,17 +1,11 @@
 import React, { useEffect, useReducer, useState } from "react";
 import QuizCard from "./QuizCard";
-import quizSampleData from "../assets/quiz-sample.json";
 import quizzesReducer from "../helpers/quizzesReducer";
 import QuizResult from "./QuizResult";
 
-function QuizPlayer({ time = 60 }) {
-  // To be removed and integrate API
-  const data = JSON.stringify(quizSampleData);
-  const json = JSON.parse(data);
-
+function QuizPlayer({ data = { results: [] } }) {
   const [allQuestionsVisited, setAllQuestionsVisited] = useState(false);
   const [allQuestionsAttempted, setAllQuestionsAttempted] = useState(false);
-  // const [anyQuestionSkipped, setAnyQuestionSkipped] = useState(false);
   const [skippedQuestions, setSkippedQuestions] = useState(0);
 
   const [quizzes, dispatch] = useReducer(quizzesReducer, {
@@ -23,9 +17,9 @@ function QuizPlayer({ time = 60 }) {
     data: [],
   });
   const [counter, setCounter] = useState({
-    minute: "00",
-    second: "30",
-    count: time,
+    minute: 0,
+    second: 0,
+    count: data.time,
   });
 
   useEffect(() => {
@@ -81,7 +75,7 @@ function QuizPlayer({ time = 60 }) {
       );
       // Clear the timeout when the component unmounts or the counter changes
       return () => clearTimeout(timer);
-    } else if (!quizzes.showResult) {
+    } else if (!quizzes.showResult && quizzes.data.length) {
       console.log("QuizPlayer: quiz auto submitted after timer up");
       setTimeout(() => {
         dispatch({ type: "SUBMIT_QUIZ", payload: { isTimerUp: true } });
@@ -90,7 +84,7 @@ function QuizPlayer({ time = 60 }) {
   }, [counter, allQuestionsAttempted]);
 
   useEffect(() => {
-    dispatch({ type: "ADD_QUIZZES", payload: json.results });
+    dispatch({ type: "ADD_QUIZZES", payload: data.results });
   }, []);
 
   return (
@@ -135,7 +129,7 @@ function QuizPlayer({ time = 60 }) {
         <QuizResult
           isTimerUp={quizzes.isTimerUp}
           data={quizzes.data}
-          timeToSolveQuiz={Number(time) * 1000} // totoal time in milliseconds
+          timeToSolveQuiz={Number(data.time) * 1000} // totoal time in milliseconds
         />
       )}
     </>

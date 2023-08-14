@@ -29,7 +29,7 @@ const QuizCard = ({
     const timeTaken = Date.now() - questionStartedAt;
     if (isAllVisited && !skippedQuestions) {
       // console.log("QuizCard: SUBMIT_QUIZ dispatched from nextHandle");
-      console.log("QuizPlayer: quiz submitted by user after all attempted");
+      console.log("QuizCard: quiz submitted by user after all attempted");
       dispatch({
         type: "SUBMIT_QUIZ",
         payload: { index: currentQuizIndex, timeTaken },
