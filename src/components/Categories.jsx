@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import Countdown from "./CountDown";
 import { useState } from "react";
 import Loader from "./Loader";
+import { toast } from "react-toastify";
 
 function Categories({ setData }) {
   const data = JSON.stringify(categories);
@@ -43,6 +44,20 @@ function Categories({ setData }) {
             navigate("/player");
             console.log("Redirected to player");
           }, 3000);
+        } else if (json.response_code === 1) {
+          if (json.results.length) {
+            toast.info(
+              `Found ${json.results} Questions in the Quantum Realm (Requested: ${amount})`
+            );
+          } else {
+            toast.error(
+              "Oh no, our Quantum Database is empty for this request!"
+            );
+          }
+        } else {
+          toast.error(
+            "Oh no, There's something unexpected occured in the Quantum Realm"
+          );
         }
       }, 2000);
     } catch (error) {
